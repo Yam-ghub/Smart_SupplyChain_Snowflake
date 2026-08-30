@@ -1,5 +1,40 @@
 # Smart_SupplyChain_Snowflake
 
+## Setup
+-- 1. Warehouse
+```sql
+CREATE WAREHOUSE IF NOT EXISTS CPG_WH
+  WAREHOUSE_SIZE = 'XSMALL'
+  AUTO_SUSPEND = 60
+  AUTO_RESUME = TRUE
+  INITIALLY_SUSPENDED = TRUE;
+
+USE WAREHOUSE CPG_WH;
+```
+-- 2. Database + medallion schemas
+```sql
+CREATE DATABASE IF NOT EXISTS CPG_SUPPLY_CHAIN;
+USE DATABASE CPG_SUPPLY_CHAIN;
+
+CREATE SCHEMA IF NOT EXISTS BRONZE;
+CREATE SCHEMA IF NOT EXISTS SILVER;
+CREATE SCHEMA IF NOT EXISTS GOLD;
+CREATE SCHEMA IF NOT EXISTS UTILS;
+```
+-- 3. File format + stage
+```sql
+CREATE FILE FORMAT IF NOT EXISTS UTILS.CSV_FF
+  TYPE = 'CSV'
+  FIELD_DELIMITER = ','
+  SKIP_HEADER = 1
+  FIELD_OPTIONALLY_ENCLOSED_BY = '"'
+  NULL_IF = ('', 'NULL', 'null')
+  EMPTY_FIELD_AS_NULL = TRUE
+  ENCODING = 'ISO-8859-1';
+
+CREATE STAGE IF NOT EXISTS UTILS.SUPPLY_CHAIN_STAGE
+  FILE_FORMAT = UTILS.CSV_FF;
+```
 ## Bronze
 ### Creation of Bronze Table
 ```sql
@@ -10,7 +45,7 @@ CREATE TABLE IF NOT EXISTS BRONZE_ORDERS (
     _SOURCE_FILE STRING -- for data lineage if we ever load multiple files into this table
 ```
 
-### Loading/Ingesting the Data to the Bronze_Orders table
+### Ingesting the Data to the Bronze_Orders table
 ```sql
 COPY INTO BRONZE_ORDERS (
     *COLUMN NAMES
