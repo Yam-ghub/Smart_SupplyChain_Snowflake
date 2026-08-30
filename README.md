@@ -1,24 +1,27 @@
 # Smart_SupplyChain_Snowflake
 
 ## Bronze
-- Creation of Bronze Table
+### Creation of Bronze Table
 ```sql
 DROP TABLE IF EXISTS BRONZE_ORDERS;
 CREATE TABLE IF NOT EXISTS BRONZE_ORDERS (
     *COLUMN NAMES STRING DTYPE,
-    _LOAD_TS TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
-    _SOURCE_FILE STRING
+    _LOAD_TS TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(), --exact time this row was inserted
+    _SOURCE_FILE STRING -- for data lineage if we ever load multiple files into this table
 ```
-- Loading/Ingesting the Data to the Bronze_Orders table
+
+### Loading/Ingesting the Data to the Bronze_Orders table
 ```sql
 COPY INTO BRONZE_ORDERS (
     *COLUMN NAMES
+    _SOURCE_FILE-- destination column that receives METADATA$FILENAME below
 FROM (
-    --$Column number in CSV
+    -- $1 through $53 = source CSV columns, read by position (matches header order)
     SELECT $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
            $21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,
            $39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,
-           METADATA$FILENAME
+           METADATA$FILENAME --- the 54th value: which file this row came from
+   reading directly from a stage
     FROM @UTILS.SUPPLY_CHAIN_STAGE
     )
 FILE_FORMAT = (FORMAT_NAME = UTILS.CSV_FF)
