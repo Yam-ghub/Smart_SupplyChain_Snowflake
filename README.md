@@ -2,7 +2,30 @@
 
 ## Bronze
 - Creation of Bronze Table
+```sql
+DROP TABLE IF EXISTS BRONZE_ORDERS;
+CREATE TABLE IF NOT EXISTS BRONZE_ORDERS (
+    *COLUMN NAMES STRING DTYPE,
+    _LOAD_TS TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    _SOURCE_FILE STRING
+```
 - Loading/Ingesting the Data to the Bronze_Orders table
+```sql
+COPY INTO BRONZE_ORDERS (
+    *COLUMN NAMES
+FROM (
+    --$Column number in CSV
+    SELECT $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
+           $21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,
+           $39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$50,$51,$52,$53,
+           METADATA$FILENAME
+    FROM @UTILS.SUPPLY_CHAIN_STAGE
+    )
+FILE_FORMAT = (FORMAT_NAME = UTILS.CSV_FF)
+ON_ERROR = 'CONTINUE'
+PATTERN = '.*\.csv';
+)
+```
 
 ## Data Validation and Exploration
 ### Ingestion Validation Checking
