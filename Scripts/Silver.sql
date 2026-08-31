@@ -59,14 +59,6 @@ SELECT
     ORDER BY _LOAD_TS DESC
     ) = 1;                          -- dedup'
 
-/*
-- TRY_TO_...() everywhere instead of :: — bad values become NULL, not a crashed load
-- Renamed Columns for clarity
-- Dropped CUSTOMER_EMAIL, CUSTOMER_FNAME/LNAME, CUSTOMER_PASSWORD, CUSTOMER_STREET, PRODUCT_IMAGE, PRODUCT_DESCRIPTION — not needed for our analytics and it is only a generated synthetic PII data
-- WHERE ORDER_ID IS NOT NULL — remove nulls since we can't identify orders that's null
-- QUALIFY ROW_NUMBER() ... = 1 — this is the dedup, enforcing our grain (ORDER_ITEM_ID)
-*/
-
 -- We enable change tracking so this table can be used with a Stream. A Stream lets downstream steps read only the rows that are new or changed since the last time we checked, instead of reprocessing the entire table every run. This is standard practice for incremental pipelines — it saves compute and keeps runs fast, especially as the table grows.
 ALTER TABLE SILVER_ORDERS SET CHANGE_TRACKING = TRUE;
 

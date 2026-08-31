@@ -90,6 +90,12 @@ HAVING COUNT(*) > 1
 ```
 
 ## Silver
+### Objectives
+- TRY_TO_...() everywhere instead of :: — bad values become NULL, not a crashed load
+- Renamed Columns for clarity
+- Dropped CUSTOMER_EMAIL, CUSTOMER_FNAME/LNAME, CUSTOMER_PASSWORD, CUSTOMER_STREET, PRODUCT_IMAGE, PRODUCT_DESCRIPTION — not needed for our analytics and it is only a generated synthetic PII data
+- WHERE ORDER_ID IS NOT NULL — remove nulls since we can't identify orders that's null
+- QUALIFY ROW_NUMBER() ... = 1 — this is the dedup, enforcing our grain (ORDER_ITEM_ID)
 
 ```sql
 USE DATABASE CPG_SUPPLY_CHAIN;
