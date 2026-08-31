@@ -159,3 +159,21 @@ SELECT
     ORDER BY _LOAD_TS DESC
     ) = 1;                          -- dedup'
 ```
+```sql
+  --this lets us later put a Stream on Silver too, so Gold can process only new/changed rows instead of full-refreshing.
+    ALTER TABLE SILVER_ORDERS SET CHANGE_TRACKING = TRUE;
+```
+### Transformation Quality Check
+```sql
+    -- Silver table changes validation
+    SELECT COUNT(*) FROM SILVER_ORDERS;
+
+    -- Should return 0 rows if our grain/dedup logic is correct
+    SELECT ORDER_ITEM_ID, COUNT(*) 
+    FROM SILVER_ORDERS
+    GROUP BY ORDER_ITEM_ID
+    HAVING COUNT(*) > 1;
+
+  -- Value spot check a few rows
+    SELECT * FROM SILVER_ORDERS LIMIT 10;
+```
