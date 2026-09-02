@@ -16,3 +16,13 @@ FROM(
     SELECT DATEADD(DAY, SEQ4(), '2015-01-01')::DATE AS DATE_KEY
     FROM TABLE(GENERATOR(ROWCOUNT => 3653))
     ) AS GENERATED_DATES -- ~10 years of datas from 2015-01-01
+
+--1. Confirm DIM_DATE built correctly
+SELECT COUNT(*) FROM DIM_DATE; 
+-- expect 3653
+
+SELECT MIN(DATE_KEY), MAX(DATE_KEY) FROM DIM_DATE;
+-- expect 2015-01-01 to roughly 2024-12-31
+
+SELECT * FROM DIM_DATE LIMIT 10; 
+-- column spotting
