@@ -1,7 +1,6 @@
--- Creates DIM_DATE dimension table with date attributes for CPG supply chain analytics
 USE DATABASE CPG_SUPPLY_CHAIN;
 USE SCHEMA GOLD;
-
+-- Creates DIM_DATE dimension table
 CREATE OR REPLACE TABLE DIM_DATE AS
 SELECT 
     DATE_KEY,
@@ -20,9 +19,30 @@ FROM(
 --1. Confirm DIM_DATE built correctly
 SELECT COUNT(*) FROM DIM_DATE; 
 -- expect 3653
-
 SELECT MIN(DATE_KEY), MAX(DATE_KEY) FROM DIM_DATE;
 -- expect 2015-01-01 to roughly 2024-12-31
-
 SELECT * FROM DIM_DATE LIMIT 10; 
 -- column spotting
+
+-- Creates DIM_PRODUCT dimension table
+CREATE OR REPLACE TABLE DIM_PRODUCT AS 
+SELECT
+    PRODUCT_ID,
+    PRODUCT_NAME,
+    CATEGORY_NAME,
+    DEPARTMENT_NAME,
+    PRODUCT_PRICE
+FROM (
+    SELECT 
+        PRODUCT_ID,
+        PRODUCT_NAME,
+        CATEGORY_NAME,
+        DEPARTMENT_NAME,
+        PRODUCT_PRICE,
+        ROW_NUMBER() OVER (
+            PARTITION BY PRODUCT_ID
+            ORDER BY _LOAD_TS DESC
+        ) AS RN
+    FROM SILVER.SILVER_ORDERS
+) AS DEDUPED
+WHERE RN = 1;
