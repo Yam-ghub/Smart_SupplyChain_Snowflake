@@ -177,3 +177,38 @@ SELECT
   -- Value spot check a few rows
     SELECT * FROM SILVER_ORDERS LIMIT 10;
 ```
+
+### Gold Layer
+```sql
+  -- Creates DIM_DATE dimension table with date attributes for CPG supply chain analytics
+  USE DATABASE CPG_SUPPLY_CHAIN;
+  USE SCHEMA GOLD;
+
+  CREATE OR REPLACE TABLE DIM_DATE AS
+  SELECT 
+      DATE_KEY,
+      YEAR(DATE_KEY) AS YEAR,
+      QUARTER(DATE_KEY) AS QUARTER,
+      MONTH(DATE_KEY) AS MONTH,
+      DAY(DATE_KEY) AS DAY_OF_MONTH,
+      DAYOFWEEK(DATE_KEY) AS DAY_OF_WEEK,
+      DAYNAME(DATE_KEY) AS DAY_NAME,
+      IFF(DAYOFWEEK(DATE_KEY) IN (0, 6), TRUE, FALSE) AS IS_WEEKEND
+  FROM(
+      SELECT DATEADD(DAY, SEQ4(), '2015-01-01')::DATE AS DATE_KEY
+      FROM TABLE(GENERATOR(ROWCOUNT => 3653))
+      ) AS GENERATED_DATES -- ~10 years of datas from 2015-01-01
+```
+### DIM_DATE dimension validation
+```sql
+  
+  SELECT COUNT(*) FROM DIM_DATE; 
+  -- expect 3653
+
+  SELECT MIN(DATE_KEY), MAX(DATE_KEY) FROM DIM_DATE;
+  -- expect 2015-01-01 to roughly 2024-12-31
+
+  SELECT * FROM DIM_DATE LIMIT 10; 
+  -- column spotting
+```
+
