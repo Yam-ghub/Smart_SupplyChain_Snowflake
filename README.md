@@ -568,6 +568,7 @@ EXECUTE TASK TASK_LOAD_BRONZE;
 ```
 
 ### Post Pipeline run validation
+```sql
 -- Checking the if newly uploaded file is good
 SELECT FILE_NAME, LAST_LOAD_TIME, ROW_COUNT
 FROM TABLE(INFORMATION_SCHEMA.COPY_HISTORY(
