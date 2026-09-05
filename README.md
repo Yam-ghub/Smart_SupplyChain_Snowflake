@@ -553,6 +553,9 @@ BEGIN
     FROM GOLD.FACT_ORDERS;
 END;
 ```
+
+## Task Validation and Manual run
+```sql
 -- to show tasks all should be suspended
 SHOW TASKS;
 
@@ -562,7 +565,9 @@ ALTER TASK TASK_LOAD_BRONZE RESUME;
 
 -- Manual trigger the pipeline
 EXECUTE TASK TASK_LOAD_BRONZE;
+```
 
+### Post Pipeline run validation
 -- Checking the if newly uploaded file is good
 SELECT FILE_NAME, LAST_LOAD_TIME, ROW_COUNT
 FROM TABLE(INFORMATION_SCHEMA.COPY_HISTORY(
