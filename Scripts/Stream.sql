@@ -16,12 +16,13 @@ SELECT SYSTEM$STREAM_HAS_DATA('SILVER_ORDERS_STREAM');
 
 -- Orchaestration
 -- be sure the pipeline_log was created in setup
+-- note: it should be created from parent to child
 SELECT * FROM CPG_SUPPLY_CHAIN.UTILS.PIPELINE_RUN_LOG LIMIT 5;
 
 -- Bronze
 CREATE OR REPLACE TASK TASK_LOAD_BRONZE
   WAREHOUSE = CPG_WH
-  SCHEDULE = 'USING CRON 0 4 * * * Asia/Manila'  -- runs daily at 3am PHT
+  SCHEDULE = 'USING CRON 0 4 * * * Asia/Manila'  -- runs daily at 4am PHT
 AS
 BEGIN
     COPY INTO BRONZE.BRONZE_ORDERS (
@@ -119,7 +120,6 @@ FROM TABLE(INFORMATION_SCHEMA.COPY_HISTORY(
     START_TIME => DATEADD(DAY, -30, CURRENT_TIMESTAMP())
 ));
 
--- note: it should be created from parent to child
 -- Gold 
 CREATE OR REPLACE TASK TASK_REFRESH_GOLD
     WAREHOUSE = CPG_WH
